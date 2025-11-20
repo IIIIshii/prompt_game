@@ -1,5 +1,3 @@
-require "openai"
-
 class DaysController < ApplicationController
     before_action :check_permission, only: [:play, :next_turn]
 
@@ -21,7 +19,7 @@ class DaysController < ApplicationController
         
         # 初期画像のセット (.envから)
         if ENV['INITIAL_IMAGE_#{@day.id}'] && File.exist?(ENV['INITIAL_IMAGE_#{@day.id}'])
-          turn = day.turns.create(turn_index: 1, prompt: ENV['INITIAL_PROMPT_#{@day.id}'])
+          turn = @day.turns.create(turn_index: 1, prompt: ENV['INITIAL_PROMPT_#{@day.id}'])
           turn.image.attach(
             io: URI.open(ENV['INITIAL_IMAGE_#{@day.id}']),
             filename: "initial_image_#{@day.id}.png"
@@ -61,26 +59,12 @@ class DaysController < ApplicationController
         @new_turn = @day.turns.create(turn_index: next_turn_index, prompt: prompt)
         
         begin
-            @client = OpenAI::Client.new(access_token: ENV.fetch("OPENAI_API_TOKEN"))
-            response = @client.images.generate(
-                parameters: {
-                    model: "dall-e-2",
-                    prompt: @new_turn.prompt,
-                    n: 1,
-                    size: "512x512"
-                }
-            )
-            image_url = response.dig("data", 0, "url")
-            image_data = URI.open(image_url)
-            @new_turn.image.attach(io: image_data, filename: "turn_#{next_turn_index}.png")
-
+            ImageGenerationService.new(@new_turn).call
             # 新しく生成されたターンIDをセッションに保存
             session["new_turn_id_#{@day.id}"] = @new_turn.id
             redirect_to play_day_path(@day), notice: "Turn created successfully"
-        rescue => e
-            Rails.logger.error "画像生成エラー: #{e.message}"
-            Rails.logger.error e.backtrace.join("\n")
-            redirect_to play_day_path(@day), alert: "画像生成に失敗しました: #{e.message}"
+        rescue ImageGenerationService::ImageGenerationError => e
+            redirect_to play_day_path(@day), alert: e.message
         end
     end
     def check_permission
