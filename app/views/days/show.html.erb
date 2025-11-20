@@ -1,0 +1,53 @@
+<div class="chat-container">
+  <div class="chat-header">
+    <h1>生成AIイラスト伝言ゲーム NF <%= @day.id %>日目</h1>
+  </div>
+
+  <% if @turns.nil? || @turns.empty? %>
+    <div class="empty-state">
+      <p>まだゲームが始まっていません。</p>
+    </div>
+  <% else %>
+    
+    <div class="chat-scroll-container">
+      <div class="chat-messages">
+        <% @turns.each do |turn| %>
+          <div class="chat-message-group">
+            
+          <!-- ユーザー側（右側）: プロンプト -->
+          <div class="message-user">
+            <div class="message-bubble message-bubble-user">
+              <div class="message-content"><%= turn.prompt %></div>
+            </div>
+            <div class="avatar-wrapper">
+              <div class="avatar-nickname">user</div>
+              <div class="avatar avatar-user">
+                👤
+              </div>
+            </div>
+          </div>
+
+            <!-- AI側（左側）: 画像 -->
+            <div class="message-ai">
+              <div class="avatar-wrapper">
+                <div class="avatar-nickname">生成AI</div>
+                <div class="avatar avatar-ai">
+                  🤖
+                </div>
+              </div>
+              <div class="message-bubble message-bubble-ai">
+                <% if turn.image.attached? %>
+                  <%= image_tag turn.image, class: "message-image" %>
+                <% else %>
+                  <div class="message-loading">（画像生成中...）</div>
+                <% end %>
+              </div>
+            </div>
+
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+  <% end %>
+  </div>

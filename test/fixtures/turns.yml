@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  day: one
+  turn_index: 1
+  prompt: MyText
+
+two:
+  day: two
+  turn_index: 1
+  prompt: MyText
