@@ -44,6 +44,12 @@ class DaysController < ApplicationController
             return
         end
         @last_turn = @day.turns.last
+        
+        # 新しく生成されたターンがあるかチェック
+        if session["new_turn_id_#{@day.id}"]
+            @new_turn = @day.turns.find_by(id: session["new_turn_id_#{@day.id}"])
+            session.delete("new_turn_id_#{@day.id}")
+        end
     end
 
     def next_turn
@@ -68,6 +74,8 @@ class DaysController < ApplicationController
             image_data = URI.open(image_url)
             @new_turn.image.attach(io: image_data, filename: "turn_#{next_turn_index}.png")
 
+            # 新しく生成されたターンIDをセッションに保存
+            session["new_turn_id_#{@day.id}"] = @new_turn.id
             redirect_to play_day_path(@day), notice: "Turn created successfully"
         rescue => e
             Rails.logger.error "画像生成エラー: #{e.message}"

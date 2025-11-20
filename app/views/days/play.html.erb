@@ -1,31 +1,89 @@
-<h1>お絵描き伝言ゲーム</h1>
+<div class="chat-container">
+  <div class="chat-header">
+    <h1>生成AIイラスト伝言ゲーム NF <%= @day.id %>日目</h1>
+    <p>次のイラストを描かせましょう</p>
+  </div>
 
-<% if flash[:notice] %>
-  <div style="color: green; font-weight: bold;"><%= flash[:notice] %></div>
-<% end %>
-
-<div style="border: 2px solid #ccc; padding: 20px; margin-bottom: 20px;">
-  <h2>直前のイラスト</h2>
-  <p>Turn: <%= @last_turn.turn_index %></p>
-  
-  <% if @last_turn.image.attached? %>
-    <%= image_tag @last_turn.image, style: "max-width: 500px; border: 1px solid #000;" %>
-  <% else %>
-    <p>画像がありません（最初のターンかも？）</p>
-    <p>プロンプト: <%= @last_turn.prompt %></p>
+  <% if flash[:notice] %>
+    <div class="flash-notice"><%= flash[:notice] %></div>
   <% end %>
-</div>
 
-<div style="background-color: #f9f9f9; padding: 20px;">
-  <h2>次のイラストを描かせる</h2>
-  <p>この絵を見て、何が描かれているか（または次の展開）をプロンプトで指示してください。</p>
+  <div class="chat-scroll-container">
+    <div class="play-section">
+      <div class="play-image-section">
+        <h2 class="play-section-title">直前のイラスト</h2>
+        
+        <% if @last_turn.image.attached? %>
+          <div class="play-image-wrapper">
+            <%= image_tag @last_turn.image, class: "play-image" %>
+          </div>
+        <% else %>
+          <div class="empty-state">
+            <p>画像がありません（近くの部員に問い合わせてください！）</p>
+            <% if @last_turn.prompt.present? %>
+              <p class="play-prompt">プロンプト: <%= @last_turn.prompt %></p>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
 
-  <%= form_with url: next_turn_day_path(@day), local: true do |f| %>
-    <div style="margin-bottom: 10px;">
-      <%= f.label :prompt, "プロンプトを入力:" %>
-      <%= f.text_field :prompt, style: "width: 300px;", required: true, placeholder: "例: 青い帽子をかぶった猫" %>
+      <div class="play-form-section">
+        <h2 class="play-section-title">次のイラストを描かせる</h2>
+        <p class="play-description">このイラストに描かれていると思ったものをプロンプトで指示してください。</p>
+
+        <%= form_with url: next_turn_day_path(@day), local: true, class: "play-form" do |f| %>
+          <div class="form-group">
+            <%= f.label :prompt, "プロンプトを入力:", class: "form-label" %>
+            <%= f.text_field :prompt, class: "form-input", required: true, placeholder: "例: 空を飛ぶ猫のイラスト", disabled: (@new_turn && @new_turn.image.attached?) %>
+          </div>
+          
+          <%= f.submit "送信して描かせる（10秒ほどかかります）", class: "form-submit", data: { disable_with: "描いています..." }, disabled: (@new_turn && @new_turn.image.attached?) %>
+        <% end %>
+      </div>
+
+      <% if @new_turn && @new_turn.image.attached? %>
+        <div class="play-new-image-section" id="new-image-section">
+          <h2 class="play-section-title">描いたイラスト</h2>
+          <div class="play-image-wrapper">
+            <%= image_tag @new_turn.image, class: "play-image" %>
+          </div>
+          <div class="play-completion-controls">
+            <p class="play-timer" id="timer">10秒後に自動的に次のターンに進みます...</p>
+          </div>
+        </div>
+      <% end %>
     </div>
-    
-    <%= f.submit "送信して描かせる（10秒ほどかかります）", data: { disable_with: "描いています..." } %>
-  <% end %>
+  </div>
 </div>
+
+<% if @new_turn && @new_turn.image.attached? %>
+  <script>
+    (function() {
+      let countdown = 10;
+      const timerElement = document.getElementById('timer');
+      let timerInterval;
+      let isRedirecting = false;
+
+      function redirectToNextTurn() {
+        if (isRedirecting) return;
+        isRedirecting = true;
+        window.location.href = '<%= play_day_path(@day) %>';
+      }
+
+      function updateTimer() {
+        if (countdown > 0) {
+          timerElement.textContent = countdown + '秒後に自動的に次のターンに進みます...';
+          countdown--;
+        } else {
+          clearInterval(timerInterval);
+          timerElement.textContent = '次のターンに進みます...';
+          redirectToNextTurn();
+        }
+      }
+
+      // タイマー開始
+      timerInterval = setInterval(updateTimer, 1000);
+      updateTimer();
+    })();
+  </script>
+<% end %>
