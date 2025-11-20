@@ -10,13 +10,13 @@ class DaysController < ApplicationController
     @day = Day.find(params[:id])
     unless @day.active?
       render plain: "このページは現在無効化されています", status: :forbidden
-      return
-    end
-    if params[:pass] == ENV["PLAY_PASS"]
-      session["access_granted_#{@day.id}"] = true
-      redirect_to play_day_path(@day), notice: "playable in this machine"
     else
-      render plain: "access denied", status: :forbidden
+      if params[:pass] == ENV["PLAY_PASS"]
+        session["access_granted_#{@day.id}"] = true
+        redirect_to play_day_path(@day), notice: "playable in this machine"
+      else
+        render plain: "access denied", status: :forbidden
+      end
     end
   end
   def create
@@ -44,18 +44,17 @@ class DaysController < ApplicationController
 
     if @day.turns.empty?
       render "No data found"
-      return
-    end
-
-    # 新しく生成されたターンがあるかチェック
-    if session["new_turn_id_#{@day.id}"]
-      @new_turn = @day.turns.find_by(id: session["new_turn_id_#{@day.id}"])
-      session.delete("new_turn_id_#{@day.id}")
-      # 新しく生成されたターンがある場合、直前のイラストはその1つ前のターン
-      @last_turn = @day.turns.where("turn_index < ?", @new_turn.turn_index).order(:turn_index).last
     else
-      # 新しく生成されたターンがない場合、最後のターンが直前のイラスト
-      @last_turn = @day.turns.last
+      # 新しく生成されたターンがあるかチェック
+      if session["new_turn_id_#{@day.id}"]
+        @new_turn = @day.turns.find_by(id: session["new_turn_id_#{@day.id}"])
+        session.delete("new_turn_id_#{@day.id}")
+        # 新しく生成されたターンがある場合、直前のイラストはその1つ前のターン
+        @last_turn = @day.turns.where("turn_index < ?", @new_turn.turn_index).order(:turn_index).last
+      else
+        # 新しく生成されたターンがない場合、最後のターンが直前のイラスト
+        @last_turn = @day.turns.last
+      end
     end
   end
 

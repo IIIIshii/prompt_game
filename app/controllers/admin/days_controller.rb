@@ -25,9 +25,7 @@ class Admin::DaysController < ApplicationController
         session[:admin_authenticated] = true
       else
         render plain: "管理者パスワードを入力してください: /admin/days?admin_pass=YOUR_PASSWORD", status: :unauthorized
-        return
       end
     end
   end
 end
-
