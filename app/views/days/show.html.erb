@@ -20,7 +20,7 @@
               <div class="message-content"><%= turn.prompt %></div>
             </div>
             <div class="avatar-wrapper">
-              <div class="avatar-nickname">user</div>
+              <div class="avatar-nickname"><%= turn.nickname.presence || "マイコン" %></div>
               <div class="avatar avatar-user">
                 👤
               </div>

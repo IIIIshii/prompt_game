@@ -29,6 +29,10 @@
 
         <%= form_with url: next_turn_day_path(@day), local: true, class: "play-form" do |f| %>
           <div class="form-group">
+            <%= f.label :nickname, "ニックネーム:", class: "form-label" %>
+            <%= f.text_field :nickname, class: "form-input", placeholder: "マイコン", value: "マイコン", disabled: (@new_turn && @new_turn.image.attached?) %>
+          </div>
+          <div class="form-group">
             <%= f.label :prompt, "プロンプトを入力:", class: "form-label" %>
             <%= f.text_field :prompt, class: "form-input", required: true, placeholder: "例: 空を飛ぶ猫のイラスト", disabled: (@new_turn && @new_turn.image.attached?) %>
           </div>

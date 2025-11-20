@@ -62,10 +62,11 @@ class DaysController < ApplicationController
   def next_turn
     @day = Day.find(params[:id])
     prompt = params[:prompt]
+    nickname = params[:nickname].presence || "マイコン"
 
     # 次のターン
     next_turn_index = @day.turns.count + 1
-    @new_turn = @day.turns.create(turn_index: next_turn_index, prompt: prompt)
+    @new_turn = @day.turns.create(turn_index: next_turn_index, prompt: prompt, nickname: nickname)
 
     begin
       ImageGenerationService.new(@new_turn).call
