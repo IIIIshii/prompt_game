@@ -1,0 +1,31 @@
+<h1>お絵描き伝言ゲーム</h1>
+
+<% if flash[:notice] %>
+  <div style="color: green; font-weight: bold;"><%= flash[:notice] %></div>
+<% end %>
+
+<div style="border: 2px solid #ccc; padding: 20px; margin-bottom: 20px;">
+  <h2>直前のイラスト</h2>
+  <p>Turn: <%= @last_turn.turn_index %></p>
+  
+  <% if @last_turn.image.attached? %>
+    <%= image_tag @last_turn.image, style: "max-width: 500px; border: 1px solid #000;" %>
+  <% else %>
+    <p>画像がありません（最初のターンかも？）</p>
+    <p>プロンプト: <%= @last_turn.prompt %></p>
+  <% end %>
+</div>
+
+<div style="background-color: #f9f9f9; padding: 20px;">
+  <h2>次のイラストを描かせる</h2>
+  <p>この絵を見て、何が描かれているか（または次の展開）をプロンプトで指示してください。</p>
+
+  <%= form_with url: next_turn_days_path, local: true do |f| %>
+    <div style="margin-bottom: 10px;">
+      <%= f.label :prompt, "プロンプトを入力:" %>
+      <%= f.text_field :prompt, style: "width: 300px;", required: true, placeholder: "例: 青い帽子をかぶった猫" %>
+    </div>
+    
+    <%= f.submit "送信して描かせる（10秒ほどかかります）", data: { disable_with: "描いています..." } %>
+  <% end %>
+</div>
