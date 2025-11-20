@@ -552,6 +552,50 @@ body {
   z-index: 1;
 }
 
+/* ナビゲーションフッター */
+.navigation-footer {
+  text-align: center;
+  margin-top: 40px;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.nav-back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.nav-back-button:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.nav-back-button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-back-icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.nav-back-text {
+  font-size: 15px;
+}
+
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
   .chat-container {
@@ -644,6 +688,24 @@ body {
   .form-submit {
     font-size: 14px;
     padding: 10px 20px;
+  }
+
+  .navigation-footer {
+    margin-top: 30px;
+    padding: 16px;
+  }
+
+  .nav-back-button {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  .nav-back-icon {
+    font-size: 16px;
+  }
+
+  .nav-back-text {
+    font-size: 14px;
   }
 }
 
