@@ -1,6 +1,17 @@
 require "openai"
 
 class DaysController < ApplicationController
+    before_action :check_permission, only: [:play, :next_turn]
+
+    def entry
+        if params[:pass] == ENV['PLAY_PASS']
+          session[:access_granted] = true
+          redirect_to play_days_path, notice: "playable in this machine"
+        else
+          render plain: "access denied", status: :forbidden
+        end
+      end
+
     def play
         @day = Day.last
 
@@ -33,4 +44,9 @@ class DaysController < ApplicationController
 
         redirect_to play_days_path, notice: "Turn created successfully"
     end
+    def check_permission
+        unless session[:access_granted]
+          render plain: "access denied", status: :forbidden
+        end
+      end
 end
