@@ -1,34 +1,19 @@
-<div style="max-width: 800px; margin: 0 auto; padding: 20px; font-family: sans-serif;">
-  <h1 style="text-align: center;">🎨 お絵描き伝言ゲーム ログ</h1>
+<h1>ゲーム一覧</h1>
 
-  <% if @turns.empty? %>
-    <p style="text-align: center;">まだゲームが始まっていません。</p>
-  <% else %>
-    
-    <% @turns.each do |turn| %>
-      <div style="margin-bottom: 40px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
-        
-        <div style="background-color: #e0f7fa; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
-          <strong>Turn <%= turn.turn_index %> の指令:</strong><br>
-          <span style="font-size: 1.2em;"><%= turn.prompt %></span>
-        </div>
+<%= button_to "＋ 新しいゲームを作る", days_path, method: :post, style: "padding: 10px; font-size: 16px; cursor: pointer;" %>
 
-        <div style="text-align: center; font-size: 20px; color: #ccc;">⬇ AIが描いた絵 ⬇</div>
+<hr>
 
-        <div style="text-align: center; margin-top: 10px;">
-          <% if turn.image.attached? %>
-            <%= image_tag turn.image, style: "max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" %>
-          <% else %>
-            <p>（画像生成中...）</p>
-          <% end %>
-        </div>
-
-      </div>
-    <% end %>
-
+<ul>
+  <% @days.each do |day| %>
+    <li style="margin-bottom: 10px;">
+      <strong>Day ID: <%= day.id %></strong> 
+      ( <%= day.created_at.strftime('%Y/%m/%d %H:%M') %> )
+      <br>
+      <%= link_to "📜 ログを見る", day_path(day) %>
+      
+      | 🎮 プレイURL: 
+      <code><%= entry_day_url(day, pass: "パスワード") %></code>
+    </li>
   <% end %>
-  
-  <div style="text-align: center; margin-top: 50px;">
-    <p>ゲームに参加するには専用のURLが必要です。</p>
-  </div>
-</div>
+</ul>

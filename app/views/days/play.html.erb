@@ -20,7 +20,7 @@
   <h2>次のイラストを描かせる</h2>
   <p>この絵を見て、何が描かれているか（または次の展開）をプロンプトで指示してください。</p>
 
-  <%= form_with url: next_turn_days_path, local: true do |f| %>
+  <%= form_with url: next_turn_day_path(@day), local: true do |f| %>
     <div style="margin-bottom: 10px;">
       <%= f.label :prompt, "プロンプトを入力:" %>
       <%= f.text_field :prompt, style: "width: 300px;", required: true, placeholder: "例: 青い帽子をかぶった猫" %>
