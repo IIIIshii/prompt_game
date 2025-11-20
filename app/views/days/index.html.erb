@@ -12,17 +12,27 @@
     <div class="chat-scroll-container">
       <div class="game-list">
         <% @days.each do |day| %>
-          <div class="game-card">
+          <div class="game-card <%= 'game-card-disabled' unless day.active? %>">
             <div class="game-card-header">
               <div class="game-card-title">
                 <span class="game-id">Day <%= day.id %></span>
+                <% unless day.active? %>
+                  <span class="status-badge status-inactive">まだ見られません</span>
+                <% end %>
               </div>
             </div>
             <div class="game-card-content">
               <div class="game-card-actions">
-                <%= link_to day_path(day), class: "game-link" do %>
-                  <span class="game-link-icon">📜</span>
-                  <span class="game-link-text">ログを見る</span>
+                <% if day.active? %>
+                  <%= link_to day_path(day), class: "game-link" do %>
+                    <span class="game-link-icon">📜</span>
+                    <span class="game-link-text">ログを見る</span>
+                  <% end %>
+                <% else %>
+                  <span class="game-link game-link-disabled">
+                    <span class="game-link-icon">📜</span>
+                    <span class="game-link-text">ログを見る</span>
+                  </span>
                 <% end %>
               </div>
             </div>

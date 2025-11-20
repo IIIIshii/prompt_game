@@ -2,8 +2,7 @@ class Day < ApplicationRecord
   has_many :turns, dependent: :destroy
 
   enum :status, {
-    pending: 0,
-    active: 1,
-    finished: 2
+    active: 0,
+    inactive: 1
   }
 end

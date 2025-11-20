@@ -1,5 +1,6 @@
 class DaysController < ApplicationController
   before_action :check_permission, only: [ :play, :next_turn ]
+  before_action :check_day_active, only: [ :show ]
 
     def index
         @days = Day.order(created_at: :asc)
@@ -7,15 +8,19 @@ class DaysController < ApplicationController
 
   def entry
     @day = Day.find(params[:id])
-    if params[:pass] == ENV["PLAY_PASS"]
-      session["access_granted_#{@day.id}"] = true
-      redirect_to play_day_path(@day), notice: "playable in this machine"
+    unless @day.active?
+      render plain: "このページは現在無効化されています", status: :forbidden
     else
-      render plain: "access denied", status: :forbidden
+      if params[:pass] == ENV["PLAY_PASS"]
+        session["access_granted_#{@day.id}"] = true
+        redirect_to play_day_path(@day), notice: "playable in this machine"
+      else
+        render plain: "access denied", status: :forbidden
+      end
     end
   end
   def create
-    @day = Day.create(status: :active)
+    @day = Day.create(status: :inactive)
 
     # 初期画像のセット (.envから)
     if ENV["INITIAL_IMAGE_#{@day.id}"] && File.exist?(ENV["INITIAL_IMAGE_#{@day.id}"])
@@ -39,24 +44,28 @@ class DaysController < ApplicationController
 
     if @day.turns.empty?
       render "No data found"
-      return
-    end
-    @last_turn = @day.turns.last
-
-    # 新しく生成されたターンがあるかチェック
-    if session["new_turn_id_#{@day.id}"]
-      @new_turn = @day.turns.find_by(id: session["new_turn_id_#{@day.id}"])
-      session.delete("new_turn_id_#{@day.id}")
+    else
+      # 新しく生成されたターンがあるかチェック
+      if session["new_turn_id_#{@day.id}"]
+        @new_turn = @day.turns.find_by(id: session["new_turn_id_#{@day.id}"])
+        session.delete("new_turn_id_#{@day.id}")
+        # 新しく生成されたターンがある場合、直前のイラストはその1つ前のターン
+        @last_turn = @day.turns.where("turn_index < ?", @new_turn.turn_index).order(:turn_index).last
+      else
+        # 新しく生成されたターンがない場合、最後のターンが直前のイラスト
+        @last_turn = @day.turns.last
+      end
     end
   end
 
   def next_turn
     @day = Day.find(params[:id])
     prompt = params[:prompt]
+    nickname = params[:nickname].presence || "マイコン"
 
     # 次のターン
     next_turn_index = @day.turns.count + 1
-    @new_turn = @day.turns.create(turn_index: next_turn_index, prompt: prompt)
+    @new_turn = @day.turns.create(turn_index: next_turn_index, prompt: prompt, nickname: nickname)
 
     begin
       ImageGenerationService.new(@new_turn).call
@@ -69,8 +78,15 @@ class DaysController < ApplicationController
   end
   def check_permission
     @day = Day.find(params[:id])
-    unless session["access_granted_#{@day.id}"]
+    unless @day.active? && session["access_granted_#{@day.id}"]
       render plain: "access denied", status: :forbidden
+    end
+  end
+
+  def check_day_active
+    @day = Day.find(params[:id])
+    unless @day.active?
+      render plain: "このページは現在無効化されています", status: :forbidden
     end
   end
 end

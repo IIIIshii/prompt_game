@@ -1,0 +1,110 @@
+<div class="chat-container">
+  <div class="chat-header">
+    <h1>管理者画面 - Day管理</h1>
+    <p>各Dayのアクセス制御を管理できます。</p>
+  </div>
+
+  <% if @days.nil? || @days.empty? %>
+    <div class="empty-state">
+      <p>まだDayが作成されていません。</p>
+    </div>
+  <% else %>
+    <div class="chat-scroll-container">
+      <div class="game-list">
+        <% @days.each do |day| %>
+          <div class="game-card">
+            <div class="game-card-header">
+              <div class="game-card-title">
+                <span class="game-id">Day <%= day.id %></span>
+                <span class="status-badge <%= day.active? ? 'status-active' : 'status-inactive' %>">
+                  <%= day.active? ? '有効' : '無効' %>
+                </span>
+              </div>
+            </div>
+            <div class="game-card-content">
+              <div class="game-card-actions">
+                <%= form_with url: toggle_status_admin_day_path(day), method: :patch, local: true, class: "toggle-form" do |f| %>
+                  <%= f.submit day.active? ? "無効化する" : "有効化する", 
+                      class: "game-link #{day.active? ? 'btn-disable' : 'btn-enable'}" %>
+                <% end %>
+                <%= link_to day_path(day), class: "game-link" do %>
+                  <span class="game-link-icon">📜</span>
+                  <span class="game-link-text">ログを見る</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<style>
+  .status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 10px;
+  }
+
+  .status-active {
+    background-color: #4CAF50;
+    color: white;
+  }
+
+  .status-inactive {
+    background-color: #f44336;
+    color: white;
+  }
+
+  .toggle-form {
+    display: inline-block;
+    margin-right: 10px;
+  }
+
+  .btn-disable {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-disable:hover {
+    background-color: #d32f2f;
+  }
+
+  .btn-enable {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-enable:hover {
+    background-color: #45a049;
+  }
+
+  .game-card-title {
+    display: flex;
+    align-items: center;
+  }
+</style>
+
+<div class="navigation-footer">
+  <%= link_to root_path, class: "nav-back-button" do %>
+    <span class="nav-back-icon">←</span>
+    <span class="nav-back-text">一覧に戻る</span>
+  <% end %>
+</div>
+

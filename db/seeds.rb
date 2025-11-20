@@ -10,7 +10,7 @@
 # db/seeds.rb
 
 4.times do |index|
-  day = Day.create!(status: :active)
+  day = Day.create!(status: :inactive)
   puts "新しいゲーム(ID: #{day.id})を作成しました"
   image_path = ENV["INITIAL_IMAGE_#{index+1}"]
   prompt = ENV["INITIAL_PROMPT_#{index+1}"]

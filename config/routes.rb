@@ -7,4 +7,15 @@ Rails.application.routes.draw do
       get :entry
     end
   end
+
+  namespace :admin do
+    resources :days, only: [ :index ] do
+      member do
+        patch :toggle_status
+      end
+    end
+  end
+
+  # Active Storageのルートを除外して404を返す
+  get "*path", to: "application#render_404", constraints: lambda { |req| !req.path.start_with?("/rails/active_storage") }
 end
