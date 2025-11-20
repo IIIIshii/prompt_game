@@ -4,7 +4,7 @@ class DaysController < ApplicationController
     before_action :check_permission, only: [:play, :next_turn]
 
     def index
-        @days = Day.order(created_at: :desc)
+        @days = Day.order(created_at: :asc)
     end
 
     def entry
@@ -17,18 +17,18 @@ class DaysController < ApplicationController
         end
     end
     def create
-        day = Day.create(status: :active)
+        @day = Day.create(status: :active)
         
         # 初期画像のセット (.envから)
-        if ENV['INITIAL_IMAGE_1'] && File.exist?(ENV['INITIAL_IMAGE_1'])
-          turn = day.turns.create(turn_index: 1, prompt: ENV['INITIAL_PROMPT_1'])
+        if ENV['INITIAL_IMAGE_#{@day.id}'] && File.exist?(ENV['INITIAL_IMAGE_#{@day.id}'])
+          turn = day.turns.create(turn_index: 1, prompt: ENV['INITIAL_PROMPT_#{@day.id}'])
           turn.image.attach(
-            io: URI.open(ENV['INITIAL_IMAGE_1']),
-            filename: "initial_image_1.png"
+            io: URI.open(ENV['INITIAL_IMAGE_#{@day.id}']),
+            filename: "initial_image_#{@day.id}.png"
           )
         end
     
-        redirect_to root_path, notice: "新しいゲーム(ID: #{day.id})を作成しました"
+        redirect_to root_path, notice: "新しいゲーム(ID: #{@day.id})を作成しました"
     end
 
     def show
@@ -53,20 +53,27 @@ class DaysController < ApplicationController
         #次のターン
         next_turn_index = @day.turns.count + 1
         @new_turn = @day.turns.create(turn_index: next_turn_index, prompt: prompt)
-        @client = OpenAI::Client.new
-        response = @client.images.generate(
-            parameters: {
-                model: "dall-e-2",
-                prompt: @new_turn.prompt,
-                n: 1,
-                size: "512x512"
-            }
-        )
-        image_url = response.dig("data", 0, "url")
-        image_data = URI.open(image_url)
-        @new_turn.image.attach(io: image_data, filename: "turn_#{next_turn_index}.png")
+        
+        begin
+            @client = OpenAI::Client.new(access_token: ENV.fetch("OPENAI_API_TOKEN"))
+            response = @client.images.generate(
+                parameters: {
+                    model: "dall-e-2",
+                    prompt: @new_turn.prompt,
+                    n: 1,
+                    size: "512x512"
+                }
+            )
+            image_url = response.dig("data", 0, "url")
+            image_data = URI.open(image_url)
+            @new_turn.image.attach(io: image_data, filename: "turn_#{next_turn_index}.png")
 
-        redirect_to play_day_path(@day), notice: "Turn created successfully"
+            redirect_to play_day_path(@day), notice: "Turn created successfully"
+        rescue => e
+            Rails.logger.error "画像生成エラー: #{e.message}"
+            Rails.logger.error e.backtrace.join("\n")
+            redirect_to play_day_path(@day), alert: "画像生成に失敗しました: #{e.message}"
+        end
     end
     def check_permission
         @day = Day.find(params[:id])

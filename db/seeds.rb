@@ -9,19 +9,15 @@
 #   end
 # db/seeds.rb
 
-# 1. 新しいゲームを作成
-day = Day.create!(status: :active)
-puts "新しいゲーム(ID: #{day.id})を作成しました"
-
-# 2. .envから画像パスを取得
-image_path = ENV['INITIAL_IMAGE_1']
-prompt = ENV['INITIAL_PROMPT_1']
-
-# 3. 最初のターンを作成して画像を添付
-turn = day.turns.create!(turn_index: 1, prompt: prompt)
-turn.image.attach(
-  io: URI.open(image_path),
-  filename: "initial_image.png"
-)
-
-puts "初期画像をセットしました！"
+4.times do |index|
+  day = Day.create!(status: :active)
+  puts "新しいゲーム(ID: #{day.id})を作成しました"
+    image_path = ENV["INITIAL_IMAGE_#{index+1}"]
+    prompt = ENV["INITIAL_PROMPT_#{index+1}"]
+    turn = day.turns.create!(turn_index: 1, prompt: prompt)
+    turn.image.attach(
+        io: URI.open(image_path),
+        filename: "initial_image_#{index+1}.png"
+    )
+    puts "初期画像をセットしました！"
+end

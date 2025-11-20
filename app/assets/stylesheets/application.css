@@ -156,12 +156,6 @@ body {
   font-size: 28px;
   box-shadow: var(--shadow-md);
   position: relative;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.avatar:hover {
-  transform: scale(1.05);
-  box-shadow: var(--shadow-lg);
 }
 
 .avatar-ai {
@@ -181,7 +175,6 @@ body {
   padding: 16px 20px;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-sm);
-  transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
 }
@@ -194,12 +187,6 @@ body {
   right: 0;
   bottom: 0;
   opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.message-bubble:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
 }
 
 .message-bubble-ai {
@@ -211,19 +198,10 @@ body {
   background: var(--primary-light);
 }
 
-.message-bubble-ai:hover::before {
-  opacity: 1;
-}
-
 .message-bubble-user {
   background: var(--primary-color);
   color: white;
   box-shadow: var(--shadow-sm);
-}
-
-.message-bubble-user:hover {
-  background: var(--primary-hover);
-  box-shadow: var(--shadow-md);
 }
 
 .message-label {
@@ -248,11 +226,6 @@ body {
   display: block;
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-color);
-  transition: box-shadow 0.3s ease;
-}
-
-.message-image:hover {
-  box-shadow: var(--shadow-md);
 }
 
 .message-loading {
@@ -267,6 +240,113 @@ body {
   padding: 60px 20px;
   color: var(--text-secondary);
   font-size: 16px;
+}
+
+/* ゲーム一覧ページのスタイル */
+.game-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.game-card {
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 20px;
+  animation: fadeInUp 0.4s ease-out;
+  animation-fill-mode: both;
+}
+
+.game-card:nth-child(1) { animation-delay: 0.05s; }
+.game-card:nth-child(2) { animation-delay: 0.1s; }
+.game-card:nth-child(3) { animation-delay: 0.15s; }
+.game-card:nth-child(4) { animation-delay: 0.2s; }
+.game-card:nth-child(5) { animation-delay: 0.25s; }
+
+.game-card-header {
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.game-card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.game-id {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.game-date {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.game-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.game-card-actions {
+  display: flex;
+  align-items: center;
+}
+
+.game-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: var(--shadow-sm);
+}
+
+.game-link-icon {
+  font-size: 16px;
+}
+
+.game-link-text {
+  font-size: 14px;
+}
+
+.game-card-url {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--bg-tertiary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.game-url-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.game-url-code {
+  font-size: 13px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  color: var(--primary-color);
+  background: var(--bg-color);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 .footer-note {
@@ -318,6 +398,34 @@ body {
   .message-content {
     font-size: 14px;
   }
+
+  .game-card {
+    padding: 16px;
+  }
+
+  .game-card-title {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .game-id {
+    font-size: 16px;
+  }
+
+  .game-date {
+    font-size: 13px;
+  }
+
+  .game-link {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .game-url-code {
+    font-size: 12px;
+    padding: 6px 10px;
+  }
 }
 
 /* スクロールバーのスタイリング */
@@ -332,8 +440,4 @@ body {
 ::-webkit-scrollbar-thumb {
   background: var(--primary-color);
   border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--primary-hover);
 }

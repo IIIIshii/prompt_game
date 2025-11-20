@@ -1,19 +1,34 @@
-<h1>ゲーム一覧</h1>
+<div class="chat-container">
+  <div class="chat-header">
+    <h1>NF2025 生成AIイラスト伝言ゲーム</h1>
+    <p>各日のログを見ることができます。</p>
+  </div>
 
-<%= button_to "＋ 新しいゲームを作る", days_path, method: :post, style: "padding: 10px; font-size: 16px; cursor: pointer;" %>
-
-<hr>
-
-<ul>
-  <% @days.each do |day| %>
-    <li style="margin-bottom: 10px;">
-      <strong>Day ID: <%= day.id %></strong> 
-      ( <%= day.created_at.strftime('%Y/%m/%d %H:%M') %> )
-      <br>
-      <%= link_to "📜 ログを見る", day_path(day) %>
-      
-      | 🎮 プレイURL: 
-      <code><%= entry_day_url(day, pass: "パスワード") %></code>
-    </li>
+  <% if @days.nil? || @days.empty? %>
+    <div class="empty-state">
+      <p>まだゲームが作成されていません。</p>
+    </div>
+  <% else %>
+    <div class="chat-scroll-container">
+      <div class="game-list">
+        <% @days.each do |day| %>
+          <div class="game-card">
+            <div class="game-card-header">
+              <div class="game-card-title">
+                <span class="game-id">Day <%= day.id %></span>
+              </div>
+            </div>
+            <div class="game-card-content">
+              <div class="game-card-actions">
+                <%= link_to day_path(day), class: "game-link" do %>
+                  <span class="game-link-icon">📜</span>
+                  <span class="game-link-text">ログを見る</span>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
   <% end %>
-</ul>
+</div>
