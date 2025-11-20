@@ -1,5 +1,6 @@
 class DaysController < ApplicationController
   before_action :check_permission, only: [ :play, :next_turn ]
+  before_action :check_day_active, only: [ :show ]
 
     def index
         @days = Day.order(created_at: :asc)
@@ -7,6 +8,10 @@ class DaysController < ApplicationController
 
   def entry
     @day = Day.find(params[:id])
+    unless @day.active?
+      render plain: "このDayは現在無効化されています", status: :forbidden
+      return
+    end
     if params[:pass] == ENV["PLAY_PASS"]
       session["access_granted_#{@day.id}"] = true
       redirect_to play_day_path(@day), notice: "playable in this machine"
@@ -15,7 +20,7 @@ class DaysController < ApplicationController
     end
   end
   def create
-    @day = Day.create(status: :active)
+    @day = Day.create(status: :inactive)
 
     # 初期画像のセット (.envから)
     if ENV["INITIAL_IMAGE_#{@day.id}"] && File.exist?(ENV["INITIAL_IMAGE_#{@day.id}"])
@@ -69,8 +74,15 @@ class DaysController < ApplicationController
   end
   def check_permission
     @day = Day.find(params[:id])
-    unless session["access_granted_#{@day.id}"]
+    unless @day.active? && session["access_granted_#{@day.id}"]
       render plain: "access denied", status: :forbidden
+    end
+  end
+
+  def check_day_active
+    @day = Day.find(params[:id])
+    unless @day.active?
+      render plain: "このDayは現在無効化されています", status: :forbidden
     end
   end
 end
