@@ -7,4 +7,5 @@ Rails.application.routes.draw do
       get :entry
     end
   end
+  get "*path", to: "application#render_404"
 end
