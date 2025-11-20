@@ -9,7 +9,7 @@ class DaysController < ApplicationController
   def entry
     @day = Day.find(params[:id])
     unless @day.active?
-      render plain: "このDayは現在無効化されています", status: :forbidden
+      render plain: "このページは現在無効化されています", status: :forbidden
       return
     end
     if params[:pass] == ENV["PLAY_PASS"]
@@ -46,12 +46,16 @@ class DaysController < ApplicationController
       render "No data found"
       return
     end
-    @last_turn = @day.turns.last
 
     # 新しく生成されたターンがあるかチェック
     if session["new_turn_id_#{@day.id}"]
       @new_turn = @day.turns.find_by(id: session["new_turn_id_#{@day.id}"])
       session.delete("new_turn_id_#{@day.id}")
+      # 新しく生成されたターンがある場合、直前のイラストはその1つ前のターン
+      @last_turn = @day.turns.where("turn_index < ?", @new_turn.turn_index).order(:turn_index).last
+    else
+      # 新しく生成されたターンがない場合、最後のターンが直前のイラスト
+      @last_turn = @day.turns.last
     end
   end
 
@@ -82,7 +86,7 @@ class DaysController < ApplicationController
   def check_day_active
     @day = Day.find(params[:id])
     unless @day.active?
-      render plain: "このDayは現在無効化されています", status: :forbidden
+      render plain: "このページは現在無効化されています", status: :forbidden
     end
   end
 end
