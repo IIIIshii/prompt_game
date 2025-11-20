@@ -48,5 +48,14 @@ class DaysController < ApplicationController
         unless session[:access_granted]
           render plain: "access denied", status: :forbidden
         end
-      end
+    end
+    def index
+        @day = Day.last
+        if @day
+          @turns = @day.turns.order(:turn_index)
+        else
+          @turns = []
+        end
+        render "index"
+    end
 end

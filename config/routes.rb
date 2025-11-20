@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  root 'days#index'
   get "days/play", to: "days#play", as: :play_days
   post "days/next_turn", to: "days#next_turn", as: :next_turn_days
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
